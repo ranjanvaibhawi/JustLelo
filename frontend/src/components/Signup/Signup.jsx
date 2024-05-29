@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai"
 import styles from "../../styles/style";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
-
+import axios from "axios"
+import serverUrl from "../../server"
 const Signup = () => {
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
@@ -11,13 +12,33 @@ const Signup = () => {
     const [name,setName]=useState("")
     const [avatar,setAvatar]=useState(null)
 
-    const handleSubmit=()=>{
-        console.log("form submitted")
-    }
+    
     const handleFileInputChange=(e)=>{
         const file=e.target.files[0]
         setAvatar(file);
     }
+   
+    const handleSubmit = async(e)=>{
+      e.preventDefault()
+     const config={headers:{"Content-Type":"multipart/form-data"}}
+      const newForm=new FormData()
+      newForm.append("file",avatar)
+      newForm.append("name",name)
+      newForm.append("email",email)
+      newForm.append("password",password)
+   
+      axios.post(`${serverUrl}/user/create-user`,newForm,config)
+      .then((res)=>{
+        console.log(res)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    }
+
+
+
+
   return (
     <div className='min-h-screen bg-gray-50 flex flex-col justify-centre py-12 sm:px-6 lg:px-8'>
         <div className='sm:mx-auto sm:w-full sm:max-w-md'>
@@ -27,7 +48,7 @@ const Signup = () => {
         </div>
         <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
             <div className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-                <form className='space-y-6'>
+                <form className='space-y-6' onSubmit={handleSubmit}>
                 <div> 
                         <label htmlFor='name' className='block text-sm font-medium text-gray-700'>Your Name</label>
                         <div className='mt-1'>
@@ -135,7 +156,12 @@ const Signup = () => {
                 Submit
               </button>
             </div>
-            
+            <div className={`${styles.noramlFlex} w-full`}>
+              <h4>Already have an account</h4>
+              <Link to="/login" className="text-blue-600 pl-2">
+                Sign In Now!
+              </Link>
+            </div>
                 </form>
             </div>
         </div>    
